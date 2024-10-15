@@ -1,5 +1,6 @@
 package study.querydsl;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
@@ -79,6 +82,25 @@ public class QuerydslBasicTest {
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    void resultFetch() {
+
+        List<Member> members = queryFactory.selectFrom(member).fetch();
+
+        Member findMember = queryFactory.selectFrom(member).fetchOne();
+
+        Member findFirstMember = queryFactory.selectFrom(member).fetchFirst();
+
+        //deprecated
+        QueryResults<Member> memberQueryResults = queryFactory.selectFrom(member).fetchResults();
+
+        //deprecated
+        long countDeprecated = queryFactory.selectFrom(member).fetchCount();
+
+        //이렇게 사용
+        long totalCount = queryFactory.select(member.count()).from(member).fetchOne();
     }
 
 }
