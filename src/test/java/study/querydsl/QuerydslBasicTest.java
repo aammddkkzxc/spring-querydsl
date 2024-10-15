@@ -12,6 +12,8 @@ import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
 
+import static study.querydsl.entity.QMember.member;
+
 @SpringBootTest
 @Transactional
 public class QuerydslBasicTest {
@@ -50,13 +52,11 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQuerydsl() {
-        QMember m = QMember.member;
-
         Member findMember = queryFactory
-                .select(m)
-                .from(m)
-                .where(m.username.eq("member1")) //파라미터 바인딩
+                .select(member)
+                .from(member)
+                .where(member.username.eq("member2")) //파라미터 바인딩
                 .fetchOne();
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+        Assertions.assertThat(findMember.getUsername()).isEqualTo("member2");
     }
 }
