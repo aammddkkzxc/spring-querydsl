@@ -68,7 +68,7 @@ public class QuerydslBasicTest {
     void search() {
         Member findMember = queryFactory
                 .selectFrom(member)
-                .where(member.username.eq("member1").and(member.age.eq(10))).fetchOne();
+                .where(member.username.eq("member1").and(member.age.eq(Integer.valueOf(10)))).fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
     }
@@ -78,7 +78,7 @@ public class QuerydslBasicTest {
         Member findMember = queryFactory
                 .selectFrom(member)
                 .where(member.username.eq("member1"),
-                        member.age.eq(10))
+                        member.age.eq(Integer.valueOf(10)))
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
@@ -122,6 +122,18 @@ public class QuerydslBasicTest {
         assertThat(member5.getUsername()).isEqualTo("member5");
         assertThat(member6.getUsername()).isEqualTo("member6");
         assertThat(memberNull.getUsername()).isNull();
+    }
+
+    @Test
+    public void paging1() {
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(0) // 0부터 시작 (zero index)
+                .limit(2) // 최대 2건 조회
+                .fetch();
+
+        assertThat(result.size()).isEqualTo(2);
     }
 
 }
