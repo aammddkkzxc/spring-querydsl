@@ -2,6 +2,7 @@ package study.querydsl;
 
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -271,5 +272,71 @@ public class QuerydslBasicTest {
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
         assertThat(loaded).as("페치 조인 적용").isTrue();
+    }
+
+    @Test
+    void subQuery() {
+        QMember subMember = new QMember("subMember");
+
+        Member result = queryFactory
+                .selectFrom(member)
+                .where(member.age.eq(
+                        JPAExpressions.select(subMember.age.max()).from(subMember)
+                ))
+                .fetchOne();
+
+        System.out.println(result);
+    }
+
+    @Test
+    void subQueryGoe() {
+        QMember subMember = new QMember("subMember");
+
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .where(member.age.goe(
+                        JPAExpressions.select(subMember.age.avg()).from(subMember)
+                ))
+                .fetch();
+
+        for (Member member : members) {
+            System.out.println(member);
+        }
+    }
+
+    @Test
+    void subQueryIn() {
+        QMember subMember = new QMember("subMember");
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .where(member.age.in(
+                        JPAExpressions
+                                .select(subMember.age)
+                                .from(subMember)
+                                .where(subMember.age.gt(10))
+                ))
+                .fetch();
+
+        for (Member member : result) {
+            System.out.println(member);
+        }
+    }
+
+    @Test
+    void selectSubQuery() {
+        QMember subMember = new QMember("subMember");
+
+        List<Tuple> tuples = queryFactory.select(
+                        member.username,
+                        JPAExpressions
+                                .select(subMember.age.avg())
+                                .from(subMember))
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : tuples) {
+            System.out.println(tuple);
+        }
     }
 }
