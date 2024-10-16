@@ -418,4 +418,30 @@ public class QuerydslBasicTest {
             System.out.println(s);
         }
     }
+
+    //엔티티 하나여도 프로젝션 하나 라고 생각하면 됨
+    @Test
+    void simpleProjections() {
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println(s);
+        }
+    }
+
+    @Test
+    void tupleProjection() {
+        List<Tuple> result = queryFactory
+                .select(member.username, member.age)
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println(tuple.get(member.username));
+            System.out.println(tuple.get(member.age));
+        }
+    }
 }
