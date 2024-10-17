@@ -100,18 +100,30 @@ public class MemberQuerydslRepositoryImpl implements MemberQuerydslRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Member> countQuery = queryFactory
-                .select(member)
+//        JPAQuery<Member> countQuery = queryFactory
+//                .select(member)
+//                .from(member)
+//                .leftJoin(member.team, team)
+//                .where(usernameEq(condition.getUsername()),
+//                        teamNameEq(condition.getTeamName()),
+//                        ageGoe(condition.getAgeGoe()),
+//                        ageLoe(condition.getAgeLoe()))
+//                ;
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(member.count())
                 .from(member)
                 .leftJoin(member.team, team)
-                .where(usernameEq(condition.getUsername()),
+                .where(
+                        usernameEq(condition.getUsername()),
                         teamNameEq(condition.getTeamName()),
                         ageGoe(condition.getAgeGoe()),
-                        ageLoe(condition.getAgeLoe()))
-                ;
+                        ageLoe(condition.getAgeLoe())
+                );
 
 
 //        Long count = queryFactory
+//                .select(Wildcard.count) //select count(*)
 //                .select(member.age.count())
 //                .from(member)
 //                .fetchOne();
@@ -119,7 +131,7 @@ public class MemberQuerydslRepositoryImpl implements MemberQuerydslRepository {
 //        List<MemberTeamDto> content = results.getResults();
 //        long total = results.getTotal();
 
-        return PageableExecutionUtils.getPage(results, pageable, () -> countQuery.fetchCount());
+        return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
 //        return new PageImpl<>(results, pageable, total);
     }
 
