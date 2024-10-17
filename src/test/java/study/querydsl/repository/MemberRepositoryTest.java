@@ -15,6 +15,7 @@ import study.querydsl.entity.Team;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static study.querydsl.entity.QMember.member;
 
 @SpringBootTest
 @Transactional
@@ -77,6 +78,17 @@ public class MemberRepositoryTest {
         assertThat(result.getContent())
                 .extracting("username")
                 .containsExactly("member1", "member2", "member3");
+    }
+
+    @Test
+    void querydslPredicateExecutorTest() {
+        Iterable<Member> members = memberRepository
+                .findAll(member.age.between(10, 40)
+                        .and(member.username.eq("member1")));
+
+        for (Member findMember : members) {
+            System.out.println("member = " + findMember);
+        }
     }
 
 }
